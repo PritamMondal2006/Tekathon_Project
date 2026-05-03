@@ -2,6 +2,7 @@
 HEATMAP is a browser-based safety monitoring tool that combines live geolocation, weather data, and hospital discovery into a single, easy-to-use interface. It was built during a hackathon to address the need for a unified, real-time safety dashboard accessible to anyone with a smartphone or browser.
 
 🛠️ Tech Stack
+
 HTML / CSS / JavaScript — Core frontend
 Geolocation API — Browser-native location detection
 Map Library — Interactive map rendering (e.g., Leaflet.js / Google Maps)
