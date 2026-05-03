@@ -10,4 +10,4 @@ Weather API — Real-time weather data
 Places API — Nearby hospital search
 GitHub Pages — Hosting and deployment
 
-# This project was created as part of Tekathon — a student hackathon focused on building technology solutions for real-world problems.
+This project was created as part of Tekathon — a student hackathon focused on building technology solutions for real-world problems.
