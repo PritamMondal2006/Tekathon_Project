@@ -36,8 +36,8 @@ button.active { background:#3b82f6; }
 /* WEATHER PANEL */
 #weather-box {
     position:fixed;
-    right: 2px;
-    top: 480px;
+    right: 1429px;
+    top: 420px;
     background: #1642e3;
     padding: 5px;
     border-radius: 12px;
