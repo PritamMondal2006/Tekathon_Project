@@ -14,12 +14,7 @@ const API_KEY = "eb58ff0428f74f66835134855260305";
 // ICONS
 const hospitalIcon = L.icon({
     iconUrl: 'https://www.clipartmax.com/png/small/28-280979_medical-logo-medical-cross-symbol-png.png'
-    iconSize: [30, 20]
-});
-
-const waterIcon = L.icon({
-    iconUrl: 'https://cdn-icons-png.flaticon.com/512/728/728093.png',
-    iconSize: [30, 30]
+    iconSize: [25, 25]
 });
 
 // INIT
