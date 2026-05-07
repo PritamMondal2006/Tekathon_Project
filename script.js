@@ -96,12 +96,13 @@ function displayWeather(data) {
     document.getElementById("wind").innerText = "🌬 Wind: " + wind + " km/h";
 
     if (centerMarker) {
-        centerMarker.bindPopup(`
-            <b>📍 ${data.location.name}</b><br>
-            🌡 ${temp}°C<br>
-            🌥 ${condition}<br>
-            💧 ${humidity}% humidity
-        `)};
+    centerMarker.bindPopup(`
+        <b>📍 ${data.location.name}</b><br>
+        🌡 ${temp}°C<br>
+        🌥 ${condition}<br>
+        💧 ${humidity}% humidity
+    `);
+}
     
     showHeatLayer(temp);
 
