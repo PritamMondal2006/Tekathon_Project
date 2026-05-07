@@ -369,5 +369,3 @@ async function showDetails(name, lat, lon, phone, emergency) {
         `;
     }
 }
-
-window.onload = initmap;
