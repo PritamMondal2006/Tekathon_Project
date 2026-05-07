@@ -17,10 +17,10 @@ const hospitalIcon = L.icon({
     iconSize: [30, 20]
 });
 
-// const waterIcon = L.icon({
-//     iconUrl: 'https://cdn-icons-png.flaticon.com/512/728/728093.png',
-//     iconSize: [30, 30]
-// });
+const waterIcon = L.icon({
+    iconUrl: 'https://cdn-icons-png.flaticon.com/512/728/728093.png',
+    iconSize: [30, 30]
+});
 
 // INIT
 function initMap() {
@@ -189,7 +189,7 @@ function searchNearby(lat, lng) {
     clearAll();
 
     if (currentLayer === 0) return showHeatLayer();
-    // if (currentLayer === 1) fetchWater(lat, lng);
+    if (currentLayer === 1) fetchWater(lat, lng);
     if (currentLayer === 2) fetchHospitals(lat, lng);
 }
 
@@ -234,63 +234,95 @@ function showHeatLayer(temp = 30) {
 
 // HOSPITALS
 async function fetchHospitals(lat, lng) {
+    clearAll();
+
     const query = `
         [out:json];
         node["amenity"="hospital"](around:8000, ${lat}, ${lng});
         out body;
     `;
 
-    const res = await fetch("https://overpass-api.de/api/interpreter", {
-        method: "POST",
-        body: query
-    });
+    try {
+        const res = await fetch("https://overpass-api.de/api/interpreter", {
+            method: "POST",
+            body: query
+        });
 
-    const data = await res.json();
+        const data = await res.json();
 
-    data.elements.forEach(place => {
-        const name = place.tags?.name || "Hospital";
-        const address = place.tags?.["addr:full"] || "Address not available";
-        const phone = place.tags?.phone || "No contact";
-        const emergency = place.tags?.emergency ? "Yes" : "No";
+        data.elements.forEach(place => {
+            const name = place.tags?.name || "Hospital";
+            let address = [
+             place.tags?.["addr:housename"],
+             place.tags?.["addr:housenumber"],
+             place.tags?.["addr:street"],
+             place.tags?.["addr:suburb"],
+             place.tags?.["addr:city"]
+           ].filter(Boolean).join(", ");
 
-        const marker = L.marker([place.lat, place.lon], {
-            icon: hospitalIcon
-        }).addTo(map);
+        // 👉 fallback 1: postcode
+        if (!address && place.tags?.["addr:postcode"]) {
+        address = "Pincode: " + place.tags["addr:postcode"];
+        }
 
-        const container = document.createElement("div");
+       // 👉 fallback 2: use name + area
+       if (!address) {
+       address = place.tags?.name + " (Location approx)";
+       }
 
-        const title = document.createElement("b");
-        title.innerText = name;
+      // 👉 final fallback
+      if (!address) {
+      address = "Address not available";
+      }
+            const phone = place.tags?.phone || "No contact";
+            const emergency = place.tags?.emergency ? "Yes" : "No";
 
-        const btn = document.createElement("button");
-        btn.innerText = "View Details";
-        btn.style.marginTop = "5px";
+            const marker = L.marker([place.lat, place.lon], {
+                icon: hospitalIcon
+            }).addTo(map);
 
-        btn.onclick = () => {
-            showDetails(name, address, phone, emergency);
-        };
+            const popupHTML = `
+                <div>
+                    <b>${name}</b><br>
+                    <button class="details-btn"
+                     data-name="${name}"
+                     data-lat="${place.lat}"
+                     data-lon="${place.lon}"
+                     data-phone="${phone}"
+                     data-emergency="${emergency}">
+                     View Details
+                    </button>
+                </div>
+            `;
 
-        container.appendChild(title);
-        container.appendChild(document.createElement("br"));
-        container.appendChild(btn);
+            marker.bindPopup(popupHTML);
 
-        marker.bindPopup(container);
+            // ✅ FIXED EVENT HANDLING
+            marker.on("popupopen", function (e) {
+                const popupNode = e.popup.getElement();
+                const btn = popupNode.querySelector(".details-btn");
 
-        markers.push(marker);
-    });
+                if (btn) {
+                    btn.onclick = function () {
+                     showDetails(
+                     this.dataset.name,
+                     this.dataset.lat,
+                     this.dataset.lon,
+                     this.dataset.phone,
+                     this.dataset.emergency
+                   );
+                };
+                }
+            });
+
+            // ✅ KEEP THIS (important for clearing markers)
+            markers.push(marker);
+        });
+
+    } catch (err) {
+        console.error("Error fetching hospitals:", err);
+    }
 }
-
-// // WATER
-// async function fetchWater(lat, lng) {
-//     const query = `[out:json];node["amenity"="drinking_water"](around:8000, ${lat}, ${lng});out;`;
-//     const res = await fetch("https://overpass-api.de/api/interpreter", { method: "POST", body: query });
-//     const data = await res.json();
-
-//     data.elements.forEach(place => {
-//         const marker = L.marker([place.lat, place.lon], { icon: waterIcon }).addTo(map);
-//         markers.push(marker);
-//     });
-// }
 
 // CLEAR
 function clearAll() {
@@ -298,6 +330,37 @@ function clearAll() {
     markers.forEach(m => map.removeLayer(m));
     markers = [];
     if (zoneCircle) map.removeLayer(zoneCircle);
+}
+
+// SHOW DETAILS
+async function showDetails(name, lat, lon, phone, emergency) {
+
+    const panel = document.getElementById("detailsPanel");
+
+    panel.innerHTML = "<p style='color:black;'>Loading address...</p>";
+    panel.style.display = "block";
+
+    try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+        const data = await res.json();
+
+        const address = data.display_name;
+
+        panel.innerHTML = `
+            <h3 style="color:black;">${name}</h3>
+            <p style="color:black;"><b>Address:</b> ${address}</p>
+            <p style="color:black;"><b>Phone:</b> ${phone}</p>
+            <p style="color:black;"><b>Emergency:</b> ${emergency}</p>
+        `;
+
+    } catch {
+        panel.innerHTML = `
+            <h3 style="color:black;">${name}</h3>
+            <p style="color:black;"><b>Address:</b> Not available</p>
+            <p style="color:black;"><b>Phone:</b> ${phone}</p>
+            <p style="color:black;"><b>Emergency:</b> ${emergency}</p>
+        `;
+    }
 }
 
 window.onload = initMap;
