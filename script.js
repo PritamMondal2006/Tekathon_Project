@@ -331,16 +331,24 @@ function clearAll() {
 // SHOW DETAILS
 async function showDetails(name, lat, lon, phone, emergency) {
 
-    const panel = document.getElementById("detailsPanel");
+    const panel = document.getElementById("details-panel");
 
-    panel.innerHTML = "<p style='color:black;'>Loading address...</p>";
+    if (!panel) {
+        console.error("details-panel not found");
+        return;
+    }
+
     panel.style.display = "block";
+    panel.innerHTML = "<p style='color:black;'>Loading address...</p>";
 
     try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+        const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
+        );
+
         const data = await res.json();
 
-        const address = data.display_name;
+        const address = data.display_name || "Address not available";
 
         panel.innerHTML = `
             <h3 style="color:black;">${name}</h3>
@@ -349,7 +357,10 @@ async function showDetails(name, lat, lon, phone, emergency) {
             <p style="color:black;"><b>Emergency:</b> ${emergency}</p>
         `;
 
-    } catch {
+    } catch (err) {
+
+        console.error(err);
+
         panel.innerHTML = `
             <h3 style="color:black;">${name}</h3>
             <p style="color:black;"><b>Address:</b> Not available</p>
@@ -359,4 +370,4 @@ async function showDetails(name, lat, lon, phone, emergency) {
     }
 }
 
-window.onload = initMap;
+window.onload = initmap;
