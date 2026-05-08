@@ -17,6 +17,11 @@ const hospitalIcon = L.icon({
     iconSize: [25, 25]
 });
 
+const waterIcon = L.icon({
+    iconUrl: 'https://cdn-icons-png.flaticon.com/512/728/728093.png',
+    iconSize: [30, 30]
+});
+
 // INIT
 function initMap() {
     map = L.map('map').setView([userLat, userLng], 13);
@@ -96,13 +101,12 @@ function displayWeather(data) {
     document.getElementById("wind").innerText = "🌬 Wind: " + wind + " km/h";
 
     if (centerMarker) {
-    centerMarker.bindPopup(`
-        <b>📍 ${data.location.name}</b><br>
-        🌡 ${temp}°C<br>
-        🌥 ${condition}<br>
-        💧 ${humidity}% humidity
-    `);
-}
+        centerMarker.bindPopup(`
+            <b>📍 ${data.location.name}</b><br>
+            🌡 ${temp}°C<br>
+            🌥 ${condition}<br>
+            💧 ${humidity}% humidity
+        `)};
     
     showHeatLayer(temp);
 
@@ -185,8 +189,7 @@ function searchNearby(lat, lng) {
     clearAll();
 
     if (currentLayer === 0) return showHeatLayer();
-    if (currentLayer === 1) fetchWater(lat, lng);
-    if (currentLayer === 2) fetchHospitals(lat, lng);
+    if (currentLayer === 1) fetchHospitals(lat, lng);
 }
 
 // HEATMAP
@@ -331,24 +334,16 @@ function clearAll() {
 // SHOW DETAILS
 async function showDetails(name, lat, lon, phone, emergency) {
 
-    const panel = document.getElementById("details-panel");
+    const panel = document.getElementById("detailsPanel");
 
-    if (!panel) {
-        console.error("details-panel not found");
-        return;
-    }
-
-    panel.style.display = "block";
     panel.innerHTML = "<p style='color:black;'>Loading address...</p>";
+    panel.style.display = "block";
 
     try {
-        const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
-        );
-
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
         const data = await res.json();
 
-        const address = data.display_name || "Address not available";
+        const address = data.display_name;
 
         panel.innerHTML = `
             <h3 style="color:black;">${name}</h3>
@@ -357,10 +352,7 @@ async function showDetails(name, lat, lon, phone, emergency) {
             <p style="color:black;"><b>Emergency:</b> ${emergency}</p>
         `;
 
-    } catch (err) {
-
-        console.error(err);
-
+    } catch {
         panel.innerHTML = `
             <h3 style="color:black;">${name}</h3>
             <p style="color:black;"><b>Address:</b> Not available</p>
@@ -370,4 +362,4 @@ async function showDetails(name, lat, lon, phone, emergency) {
     }
 }
 
-window.onload = initmap
+window.onload = initMap;
