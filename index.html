@@ -37,12 +37,19 @@
     <div id="map"></div>
 
     <!-- DETAILS PANEL -->
-    <div id="detailspanel">
-        <h3 id="d-name"></h3>
-        <p id="d-address"></p>
-        <p id="d-phone"></p>
-        <p id="d-emergency"></p>
-    </div>
+    <div id="detailsPanel" style="
+    position: fixed;
+    right: 10px;
+    top: 140px;
+    width: 250px;
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    display: none;
+    z-index: 1000;
+">
+</div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
