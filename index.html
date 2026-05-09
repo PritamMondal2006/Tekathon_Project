@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WEATHERON - Live Weather Radar</title>
-
+    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
@@ -12,17 +12,17 @@
 </head>
 
 <body>
-    <header>WEATHERON</header>
+    <div class="sidebar">
+        <p class="title">WEATHERON</p>
 
-    <div class="controls">
-        <button class="active" onclick="toggleLayer(0)">🔥 Weather</button>
-        <button onclick="toggleLayer(1)">🏥 Hospitals</button>
-        <button id="location-btn" onclick="getCurrentLocation()">📍 My Location</button>
+        <div class="controls">
+            <button class="active" onclick="toggleLayer(0)">🌡️</button>
+            <button onclick="toggleLayer(1)">🏥</button>
+            <button id="location-btn" onclick="getCurrentLocation()">📍</button>
+        </div>
+
+        <p class="watermark">Made by Team Null</p>        
     </div>
-
-    <div id="map"></div>
-
-    <!-- WEATHER PANEL -->
     <div id="weather-box">
         <h3>🌦 Weather</h3>
         <p id="location-name"></p>
@@ -33,6 +33,8 @@
         <p id="wind"></p>
         <p id="alert-box"></p>
     </div>
+    
+    <div id="map"></div>
 
     <!-- DETAILS PANEL -->
     <div id="detailspanel">
