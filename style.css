@@ -47,7 +47,7 @@ button.active { background:#3b82f6; }
 }
 
 /* DETAILS PANEL */
-#details-panel {
+#detailspanel {
     position: fixed;
     right: 20px;
     top: 100px;
