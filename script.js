@@ -174,6 +174,132 @@ function getCurrentLocation() {
     });
 }
 
+// SEARCH LOCATION
+async function searchLocation() {
+
+    const location = document.getElementById("location-input").value;
+
+    if (!location) return;
+
+    try {
+
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${location}`;
+
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.length === 0) {
+            alert("Location not found");
+            return;
+        }
+
+        const lat = parseFloat(data[0].lat);
+        const lon = parseFloat(data[0].lon);
+
+        userLat = lat;
+        userLng = lon;
+
+        // Move map
+        map.flyTo([lat, lon], 13);
+
+        // Move center marker
+        if (centerMarker) {
+            centerMarker.setLatLng([lat, lon]);
+        }
+
+        // Update weather
+        fetchWeather(lat, lon);
+
+        // Refresh current layer
+        searchNearby(lat, lon);
+
+    } catch (err) {
+        console.log("Search error:", err);
+    }
+}
+
+// AUTOCOMPLETE SEARCH
+const input = document.getElementById("location-input");
+const suggestionsBox = document.getElementById("suggestions");
+
+let searchTimeout;
+
+input.addEventListener("input", () => {
+
+    clearTimeout(searchTimeout);
+
+    searchTimeout = setTimeout(async () => {
+
+        const query = input.value.trim();
+
+        if(query.length < 2){
+            suggestionsBox.style.display = "none";
+            return;
+        }
+
+        try{
+
+            const url =
+            `https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=5`;
+
+            const res = await fetch(url);
+
+            const data = await res.json();
+
+            suggestionsBox.innerHTML = "";
+
+            if(data.length === 0){
+                suggestionsBox.style.display = "none";
+                return;
+            }
+
+            data.forEach(place => {
+
+                const item = document.createElement("div");
+
+                item.className = "suggestion-item";
+
+                item.innerText = place.display_name;
+
+                item.onclick = () => {
+
+                    input.value = place.display_name;
+
+                    suggestionsBox.style.display = "none";
+
+                    const lat = parseFloat(place.lat);
+                    const lon = parseFloat(place.lon);
+
+                    userLat = lat;
+                    userLng = lon;
+
+                    map.flyTo([lat, lon], 13);
+
+                    if(centerMarker){
+                        centerMarker.setLatLng([lat, lon]);
+                    }
+
+                    fetchWeather(lat, lon);
+
+                    searchNearby(lat, lon);
+                };
+
+                suggestionsBox.appendChild(item);
+
+            });
+
+            suggestionsBox.style.display = "block";
+
+        } catch(err){
+
+            console.log("Autocomplete error:", err);
+
+        }
+
+    }, 500); // waits 0.5 sec before API call
+
+});
+
 // LAYERS
 function toggleLayer(layer) {
     currentLayer = layer;
@@ -361,5 +487,24 @@ async function showDetails(name, lat, lon, phone, emergency) {
         `;
     }
 }
+
+document.getElementById("location-input")
+.addEventListener("keypress", function(e){
+
+    if(e.key === "Enter"){
+        searchLocation();
+    }
+
+});
+
+document.addEventListener("click", (e) => {
+
+    if(!document.getElementById("search-box").contains(e.target)){
+
+        suggestionsBox.style.display = "none";
+
+    }
+
+});
 
 window.onload = initMap;
