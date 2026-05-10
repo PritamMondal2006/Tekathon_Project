@@ -33,6 +33,20 @@
         <p id="wind"></p>
         <p id="alert-box"></p>
     </div>
+
+    <!-- SEARCH BAR -->
+    <div id="search-box">
+
+    <input
+        type="text"
+        id="location-input"
+        placeholder="Search location..."
+        autocomplete="off"
+    >
+
+    <button id="search-btn" onclick="searchLocation()">🔍</button>
+    <div id="suggestions"></div>
+    </div>
     
     <div id="map"></div>
 
@@ -48,8 +62,8 @@
     box-shadow: 0 0 10px rgba(0,0,0,0.2);
     display: none;
     z-index: 1000;
-">
-</div>
+    ">
+    </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
